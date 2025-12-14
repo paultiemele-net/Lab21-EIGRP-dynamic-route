@@ -1,0 +1,150 @@
+!==========================
+! EIGRP Routing Lab – Multi-Router LAN-to-LAN
+!==========================
+
+! Description:
+! This lab demonstrates EIGRP routing across 4 routers, enabling connectivity
+! between three LANs (PC1, PC2, PC3) through WAN links. The routers dynamically
+! exchange routing information using EIGRP in AS 100.
+
+!==========================
+! PC Configuration
+!==========================
+! PC1 (LAN1)
+IP Address: 10.10.10.2
+Gateway: 10.10.10.1
+
+! PC2 (LAN2)
+IP Address: 40.40.40.2
+Gateway: 50.50.50.1
+
+! PC3 (LAN3)
+IP Address: 70.70.70.2
+Gateway: 70.70.70.1
+
+!==========================
+! Router 1 Configuration
+!==========================
+conf t
+! LAN interface
+int e0/0
+ ip address 10.10.10.1 255.255.255.0
+ no shut
+ exit
+
+! WAN interfaces
+int e0/1
+ ip address 20.20.20.1 255.255.255.0
+ no shut
+ exit
+
+int e0/2
+ ip address 30.30.30.1 255.255.255.0
+ no shut
+ exit
+
+! DHCP for LAN
+ip dhcp excluded-address 10.10.10.1
+ip dhcp pool LAN1_POOL
+ network 10.10.10.0 255.255.255.0
+ default-router 10.10.10.1
+ exit
+
+! EIGRP Configuration
+router eigrp 100
+ router-id 1.1.1.1
+ network 10.10.10.0 0.0.0.255
+ network 20.20.20.0 0.0.0.255
+ network 30.30.30.0 0.0.0.255
+ exit
+
+!==========================
+! Router 2 Configuration
+!==========================
+conf t
+int e0/0
+ ip address 20.20.20.2 255.255.255.0
+ no shut
+ exit
+
+int e0/1
+ ip address 60.60.60.2 255.255.255.0
+ no shut
+ exit
+
+! EIGRP Configuration
+router eigrp 100
+ router-id 2.2.2.2
+ network 20.20.20.0 0.0.0.255
+ network 60.60.60.0 0.0.0.255
+ exit
+
+!==========================
+! Router 3 Configuration
+!==========================
+conf t
+int e0/0
+ ip address 50.50.50.1 255.255.255.0
+ no shut
+ exit
+
+int e0/1
+ ip address 30.30.30.2 255.255.255.0
+ no shut
+ exit
+
+int e0/2
+ ip address 40.40.40.2 255.255.255.0
+ no shut
+ exit
+
+! EIGRP Configuration
+router eigrp 100
+ router-id 3.3.3.3
+ network 50.50.50.0 0.0.0.255
+ network 30.30.30.0 0.0.0.255
+ network 40.40.40.0 0.0.0.255
+ exit
+
+!==========================
+! Router 4 Configuration
+!==========================
+conf t
+int e0/0
+ ip address 60.60.60.1 255.255.255.0
+ no shut
+ exit
+
+int e0/1
+ ip address 50.50.50.2 255.255.255.0
+ no shut
+ exit
+
+int e0/2
+ ip address 70.70.70.1 255.255.255.0
+ no shut
+ exit
+
+! DHCP for LAN3
+ip dhcp excluded-address 70.70.70.1
+ip dhcp pool LAN3_POOL
+ network 70.70.70.0 255.255.255.0
+ default-router 70.70.70.1
+ exit
+
+! EIGRP Configuration
+router eigrp 100
+ router-id 4.4.4.4
+ network 70.70.70.0 0.0.0.255
+ network 60.60.60.0 0.0.0.255
+ network 50.50.50.0 0.0.0.255
+ exit
+
+!==========================
+! Verification
+!==========================
+! Use the following commands to validate connectivity:
+! - show ip route
+! - show ip eigrp neighbors
+! - ping 40.40.40.2
+! - ping 70.70.70.2
